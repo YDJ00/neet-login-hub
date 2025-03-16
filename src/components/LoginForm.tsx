@@ -7,19 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-
-// Create a client with localStorage auth persistence
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || 'https://fakesupabaseurl.supabase.co',
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 'fake-anon-key',
-  {
-    auth: {
-      persistSession: true,
-      storageKey: 'neet-user-auth',
-    },
-  }
-);
+import { supabase } from '@/integrations/supabase/client';
 
 type FormData = {
   name: string;
@@ -101,13 +89,7 @@ const LoginForm = () => {
       
       if (fetchError) {
         console.error("Error fetching existing user:", fetchError);
-        
-        // If the error is related to Supabase connection, show helpful message
-        if (fetchError.message.includes("fetch") || fetchError.code === "PGRST301") {
-          throw new Error("Connection to database failed. Please make sure Supabase is properly configured.");
-        } else {
-          throw new Error(fetchError.message);
-        }
+        throw new Error(fetchError.message);
       }
       
       console.log("Existing users check result:", existingUsers);
@@ -133,7 +115,7 @@ const LoginForm = () => {
             name: formData.name,
             mobile: formData.mobile,
             class: formData.class,
-            email: formData.email,
+            email: formData.email || null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
