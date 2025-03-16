@@ -9,11 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client with your Supabase URL and anon key
-// These should be replaced with your actual Supabase credentials
-const supabaseUrl = 'https://your-project-url.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create a client with localStorage auth persistence
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL || 'https://fakesupabaseurl.supabase.co',
+  import.meta.env.VITE_SUPABASE_ANON_KEY || 'fake-anon-key',
+  {
+    auth: {
+      persistSession: true,
+      storageKey: 'neet-user-auth',
+    },
+  }
+);
 
 type FormData = {
   name: string;
@@ -85,6 +91,8 @@ const LoginForm = () => {
     setLoading(true);
     
     try {
+      console.log("Attempting to check for existing user with mobile:", formData.mobile);
+      
       // Check if user with same mobile number already exists
       const { data: existingUsers, error: fetchError } = await supabase
         .from('users')
@@ -92,54 +100,54 @@ const LoginForm = () => {
         .eq('mobile', formData.mobile);
       
       if (fetchError) {
-        throw new Error(fetchError.message);
+        console.error("Error fetching existing user:", fetchError);
+        
+        // If the error is related to Supabase connection, show helpful message
+        if (fetchError.message.includes("fetch") || fetchError.code === "PGRST301") {
+          throw new Error("Connection to database failed. Please make sure Supabase is properly configured.");
+        } else {
+          throw new Error(fetchError.message);
+        }
       }
       
-      // If user exists, update their data
+      console.log("Existing users check result:", existingUsers);
+      
+      // If user exists, just redirect without updating (they already have access)
       if (existingUsers && existingUsers.length > 0) {
-        const { error: updateError } = await supabase
-          .from('users')
-          .update({
+        toast({
+          title: "Login Successful!",
+          description: "Welcome back!",
+        });
+        
+        // Redirect to Google Drive after successful login
+        window.location.href = "https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing";
+        return;
+      } 
+      
+      // If user doesn't exist, create new record
+      console.log("Creating new user record");
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([
+          { 
             name: formData.name,
+            mobile: formData.mobile,
             class: formData.class,
             email: formData.email,
+            created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          })
-          .eq('mobile', formData.mobile);
-        
-        if (updateError) {
-          throw new Error(updateError.message);
-        }
-        
-        toast({
-          title: "Login Successful!",
-          description: "Your existing account has been updated.",
-        });
-      } 
-      // If user doesn't exist, create new record
-      else {
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([
-            { 
-              name: formData.name,
-              mobile: formData.mobile,
-              class: formData.class,
-              email: formData.email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ]);
-        
-        if (insertError) {
-          throw new Error(insertError.message);
-        }
-        
-        toast({
-          title: "Login Successful!",
-          description: "Your account has been created.",
-        });
+          }
+        ]);
+      
+      if (insertError) {
+        console.error("Error inserting new user:", insertError);
+        throw new Error(insertError.message);
       }
+      
+      toast({
+        title: "Login Successful!",
+        description: "Your information has been saved.",
+      });
       
       // Redirect to Google Drive after successful login
       window.location.href = "https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing";
@@ -148,7 +156,9 @@ const LoginForm = () => {
       console.error('Error:', error);
       toast({
         title: "Login Failed",
-        description: error instanceof Error ? error.message : "There was an error submitting your information. Please try again.",
+        description: error instanceof Error 
+          ? error.message 
+          : "Connection to our database failed. Please try again later.",
         variant: "destructive",
       });
     } finally {
