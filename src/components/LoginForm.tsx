@@ -6,8 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client with your Supabase URL and anon key
+// These should be replaced with your actual Supabase credentials
+const supabaseUrl = 'https://your-project-url.supabase.co';
+const supabaseAnonKey = 'your-anon-key';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type FormData = {
   name: string;
@@ -26,7 +32,6 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -80,27 +85,70 @@ const LoginForm = () => {
     setLoading(true);
     
     try {
-      // This would normally connect to a Google Sheets API
-      // For this demo, we'll simulate the API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Check if user with same mobile number already exists
+      const { data: existingUsers, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('mobile', formData.mobile);
       
-      // Log the data that would be sent to Google Sheets
-      console.log('Form data submitted:', formData);
+      if (fetchError) {
+        throw new Error(fetchError.message);
+      }
       
-      toast({
-        title: "Login Successful!",
-        description: "You're being redirected to the dashboard.",
-      });
+      // If user exists, update their data
+      if (existingUsers && existingUsers.length > 0) {
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({
+            name: formData.name,
+            class: formData.class,
+            email: formData.email,
+            updated_at: new Date().toISOString()
+          })
+          .eq('mobile', formData.mobile);
+        
+        if (updateError) {
+          throw new Error(updateError.message);
+        }
+        
+        toast({
+          title: "Login Successful!",
+          description: "Your existing account has been updated.",
+        });
+      } 
+      // If user doesn't exist, create new record
+      else {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([
+            { 
+              name: formData.name,
+              mobile: formData.mobile,
+              class: formData.class,
+              email: formData.email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ]);
+        
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+        
+        toast({
+          title: "Login Successful!",
+          description: "Your account has been created.",
+        });
+      }
       
-      // Redirect to the dashboard (we'll create this route later)
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
+      // Redirect to Google Drive after successful login
+      window.location.href = "https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing";
       
     } catch (error) {
+      console.error('Error:', error);
       toast({
         title: "Login Failed",
-        description: "There was an error submitting your information. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error submitting your information. Please try again.",
         variant: "destructive",
       });
     } finally {
