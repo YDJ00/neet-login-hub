@@ -15,6 +15,8 @@ const AccessNotes = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <AdSpace className="w-full" />
+      
       <Navbar />
       
       <main className="flex-grow container mx-auto px-4 py-8">
@@ -38,6 +40,8 @@ const AccessNotes = () => {
             <BookOpen className="mr-2 h-5 w-5 md:h-6 md:w-6" />
             Click Here to Get Subject-wise Notes
           </Button>
+          
+          <AdSpace className="w-full max-w-3xl mt-8" />
         </div>
       </main>
       

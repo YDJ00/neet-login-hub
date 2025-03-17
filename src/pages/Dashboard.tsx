@@ -1,8 +1,8 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookOpen, BookText, FileText, ArrowLeft } from 'lucide-react';
+import AdSpace from '@/components/AdSpace';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +15,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdSpace className="w-full" />
+      
       <header className="bg-white shadow">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-neet-dark">NEET PYQs Dashboard</h1>
@@ -67,6 +69,8 @@ const Dashboard = () => {
             </Button>
           </div>
         </div>
+        
+        <AdSpace className="w-full mb-8" />
       </main>
     </div>
   );
