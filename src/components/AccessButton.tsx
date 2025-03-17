@@ -14,8 +14,8 @@ const AccessButton: React.FC<AccessButtonProps> = ({ text, className }) => {
 
   return (
     <Button 
-      onClick={() => navigate('/')} 
-      className={`bg-neet-primary hover:bg-neet-dark text-white px-6 py-6 text-lg ${className}`}
+      onClick={() => navigate('/login')} 
+      className={`bg-neet-primary hover:bg-neet-dark text-white px-6 py-6 text-lg inline-flex ${className}`}
       size="lg"
     >
       <FileText className="mr-2 h-5 w-5" />

@@ -1,7 +1,6 @@
 
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
-import LoginForm from '@/components/LoginForm';
 import Footer from '@/components/Footer';
 import AdSpace from '@/components/AdSpace';
 import AccessButton from '@/components/AccessButton';
@@ -19,16 +18,10 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-neet-dark mb-6">
               Access NEET PYQs and Notes
             </h2>
-            <AccessButton text="Click Here to Access PYQs and Notes" className="w-full max-w-md" />
+            <AccessButton text="Click Here to Access PYQs and Notes" className="mx-auto" />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-            <HeroSection />
-            
-            <div className="flex justify-center">
-              <LoginForm />
-            </div>
-          </div>
+          <HeroSection />
           
           <AdSpace className="w-full max-w-3xl my-8" />
         </div>

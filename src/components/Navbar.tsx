@@ -14,7 +14,7 @@ const Navbar = () => {
         </div>
         
         <Button 
-          onClick={() => navigate('/')} 
+          onClick={() => navigate('/login')} 
           variant="outline" 
           className="border-neet-primary text-neet-primary hover:bg-neet-light"
         >
