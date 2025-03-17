@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLoginForm, FormErrors } from '@/utils/formValidation';
+import { useNavigate } from 'react-router-dom';
 
 export type LoginFormData = {
   name: string;
@@ -21,6 +22,7 @@ export const useLoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -83,8 +85,8 @@ export const useLoginForm = () => {
           description: "Welcome back!",
         });
         
-        // Redirect to Google Drive using window.location.href
-        window.open("https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing", "_blank");
+        // Navigate to the access-notes page
+        navigate('/access-notes');
         return;
       } 
       
@@ -113,8 +115,8 @@ export const useLoginForm = () => {
         description: "Your information has been saved.",
       });
       
-      // Redirect to Google Drive using window.open instead of changing the current page
-      window.open("https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing", "_blank");
+      // Navigate to the access-notes page
+      navigate('/access-notes');
       
     } catch (error) {
       console.error('Error:', error);
