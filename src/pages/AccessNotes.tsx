@@ -32,10 +32,10 @@ const AccessNotes = () => {
           
           <Button 
             onClick={handleAccessNotes} 
-            className="bg-neet-primary hover:bg-neet-dark text-white px-8 py-8 text-xl"
+            className="bg-neet-primary hover:bg-neet-dark text-white px-4 py-4 md:px-8 md:py-6 text-base md:text-xl w-auto"
             size="lg"
           >
-            <BookOpen className="mr-2 h-6 w-6" />
+            <BookOpen className="mr-2 h-5 w-5 md:h-6 md:w-6" />
             Click Here to Get Subject-wise Notes
           </Button>
         </div>
