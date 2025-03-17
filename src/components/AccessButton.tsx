@@ -15,11 +15,11 @@ const AccessButton: React.FC<AccessButtonProps> = ({ text, className }) => {
   return (
     <Button 
       onClick={() => navigate('/login')} 
-      className={`bg-neet-primary hover:bg-neet-dark text-white px-4 py-4 md:px-6 md:py-6 text-base md:text-lg inline-flex w-auto ${className}`}
+      className={`bg-neet-primary hover:bg-neet-dark text-white px-3 py-2 md:px-4 md:py-4 text-sm md:text-base inline-flex items-center justify-center w-auto max-w-full break-words ${className}`}
       size="lg"
     >
-      <FileText className="mr-2 h-5 w-5" />
-      {text}
+      <FileText className="mr-2 h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
+      <span className="text-wrap">{text}</span>
     </Button>
   );
 };
