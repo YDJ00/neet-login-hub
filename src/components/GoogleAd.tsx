@@ -1,22 +1,15 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 
 interface GoogleAdProps {
   className?: string;
-  adSlot?: string;
-  adFormat?: string;
-  adLayoutKey?: string;
+  enableAutoAds?: boolean;
 }
 
 const GoogleAd: React.FC<GoogleAdProps> = ({ 
-  className, 
-  adSlot = "9935583816", 
-  adFormat = "fluid",
-  adLayoutKey = "-ef+6k-30-ac+ty"
+  className,
+  enableAutoAds = true
 }) => {
-  // We need to remove the ref entirely since it's causing type issues
-  // and it's not necessary for the AdSense functionality
-
   useEffect(() => {
     try {
       // Check if adsbygoogle is defined
@@ -31,18 +24,13 @@ const GoogleAd: React.FC<GoogleAdProps> = ({
     }
   }, []);
 
-  return (
-    <div className={`ad-container ${className || ''}`}>
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block' }}
-        data-ad-client="ca-pub-7246515111116443"
-        data-ad-slot={adSlot}
-        data-ad-format={adFormat}
-        data-ad-layout-key={adLayoutKey}
-      />
-    </div>
-  );
+  if (enableAutoAds) {
+    // For Auto Ads, we only need to return a container div
+    // The AdSense script in index.html will handle the ad placement
+    return <div className={`ad-container ${className || ''}`}></div>;
+  }
+
+  return null;
 };
 
 export default GoogleAd;
