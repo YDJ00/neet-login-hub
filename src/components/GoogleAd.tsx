@@ -14,7 +14,8 @@ const GoogleAd: React.FC<GoogleAdProps> = ({
   adFormat = "fluid",
   adLayoutKey = "-ef+6k-30-ac+ty"
 }) => {
-  const adRef = useRef<HTMLDivElement>(null);
+  // Create a properly typed ref for the <ins> element (HTMLElement is more generic and works with ins)
+  const adRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     try {
