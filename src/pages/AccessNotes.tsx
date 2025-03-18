@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookOpen } from 'lucide-react';
-import AdSpace from '@/components/AdSpace';
+import GoogleAd from '@/components/GoogleAd';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -15,7 +15,7 @@ const AccessNotes = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <AdSpace className="w-full" />
+      <GoogleAd className="w-full" />
       
       <Navbar />
       
@@ -30,7 +30,7 @@ const AccessNotes = () => {
             Click the button below to download subject-wise notes.
           </p>
           
-          <AdSpace className="w-full max-w-3xl my-8" />
+          <GoogleAd className="w-full max-w-3xl my-8" />
           
           <Button 
             onClick={handleAccessNotes} 
@@ -41,7 +41,7 @@ const AccessNotes = () => {
             Click Here to Get Subject-wise Notes
           </Button>
           
-          <AdSpace className="w-full max-w-3xl mt-8" />
+          <GoogleAd className="w-full max-w-3xl mt-8" />
         </div>
       </main>
       

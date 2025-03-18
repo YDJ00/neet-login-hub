@@ -2,13 +2,13 @@
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import Footer from '@/components/Footer';
-import AdSpace from '@/components/AdSpace';
+import GoogleAd from '@/components/GoogleAd';
 import AccessButton from '@/components/AccessButton';
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <AdSpace className="w-full" />
+      <GoogleAd className="w-full" />
       
       <Navbar />
       
@@ -25,7 +25,7 @@ const Index = () => {
           
           <HeroSection />
           
-          <AdSpace className="w-full max-w-3xl my-8" />
+          <GoogleAd className="w-full max-w-3xl my-8" />
         </div>
       </main>
       

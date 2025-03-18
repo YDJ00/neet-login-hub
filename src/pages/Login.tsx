@@ -2,13 +2,13 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import AdSpace from '@/components/AdSpace';
+import GoogleAd from '@/components/GoogleAd';
 import LoginForm from '@/components/LoginForm';
 
 const Login = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <AdSpace className="w-full" />
+      <GoogleAd className="w-full" />
       
       <Navbar />
       
@@ -22,7 +22,7 @@ const Login = () => {
             <LoginForm />
           </div>
           
-          <AdSpace className="w-full max-w-3xl mt-12" />
+          <GoogleAd className="w-full max-w-3xl mt-12" />
         </div>
       </main>
       

@@ -1,8 +1,9 @@
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookOpen, BookText, FileText, ArrowLeft } from 'lucide-react';
-import AdSpace from '@/components/AdSpace';
+import GoogleAd from '@/components/GoogleAd';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdSpace className="w-full" />
+      <GoogleAd className="w-full" />
       
       <header className="bg-white shadow">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
@@ -70,7 +71,7 @@ const Dashboard = () => {
           </div>
         </div>
         
-        <AdSpace className="w-full mb-8" />
+        <GoogleAd className="w-full mb-8" />
       </main>
     </div>
   );
