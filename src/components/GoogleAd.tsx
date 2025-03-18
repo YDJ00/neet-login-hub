@@ -14,8 +14,8 @@ const GoogleAd: React.FC<GoogleAdProps> = ({
   adFormat = "fluid",
   adLayoutKey = "-ef+6k-30-ac+ty"
 }) => {
-  // Create a properly typed ref for the <ins> element (HTMLElement is more generic and works with ins)
-  const adRef = useRef<HTMLElement>(null);
+  // We need to remove the ref entirely since it's causing type issues
+  // and it's not necessary for the AdSense functionality
 
   useEffect(() => {
     try {
@@ -40,7 +40,6 @@ const GoogleAd: React.FC<GoogleAdProps> = ({
         data-ad-slot={adSlot}
         data-ad-format={adFormat}
         data-ad-layout-key={adLayoutKey}
-        ref={adRef}
       />
     </div>
   );
