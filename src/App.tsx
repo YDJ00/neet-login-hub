@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import AccessNotes from "./pages/AccessNotes";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import MockTest from "./pages/MockTest";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/access-notes" element={<AccessNotes />} />
+          <Route path="/mock-test" element={<MockTest />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
