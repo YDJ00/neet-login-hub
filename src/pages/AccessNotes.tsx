@@ -1,4 +1,5 @@
 
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Download } from 'lucide-react';
@@ -6,13 +7,35 @@ import GoogleAd from '@/components/GoogleAd';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { redirectToLoginIfNeeded } from '@/utils/authUtils';
+import { useToast } from '@/hooks/use-toast';
 
 const AccessNotes = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [userName, setUserName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const loggedIn = await redirectToLoginIfNeeded(navigate);
+      if (loggedIn) {
+        const name = localStorage.getItem('neet_user_name') || '';
+        setUserName(name);
+      }
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const handleAccessNotes = () => {
     window.open("https://drive.google.com/drive/folders/1LTElLgckPqzsQlDgvEztGmpsEEM3RDM4?usp=sharing", "_blank");
   };
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -35,7 +58,7 @@ const AccessNotes = () => {
         
         <div className="flex flex-col items-center justify-center space-y-8">
           <h1 className="text-3xl font-bold text-neet-dark text-center">
-            Download NEET Study Materials & Previous Year Questions
+            {userName ? `Welcome ${userName}!` : 'Download NEET Study Materials'}
           </h1>
           
           <p className="text-gray-600 text-center max-w-2xl">

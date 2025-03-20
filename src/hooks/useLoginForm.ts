@@ -80,6 +80,11 @@ export const useLoginForm = () => {
       
       // If user exists, just redirect without updating (they already have access)
       if (existingUsers && existingUsers.length > 0) {
+        // Create a session for the user using their mobile number
+        // We're using this approach since we're not using Supabase Auth directly
+        localStorage.setItem('neet_user_mobile', formData.mobile);
+        localStorage.setItem('neet_user_name', existingUsers[0].name);
+        
         toast({
           title: "Login Successful!",
           description: "Welcome back!",
@@ -109,6 +114,10 @@ export const useLoginForm = () => {
         console.error("Error inserting new user:", insertError);
         throw new Error(insertError.message);
       }
+      
+      // Create a session for the new user
+      localStorage.setItem('neet_user_mobile', formData.mobile);
+      localStorage.setItem('neet_user_name', formData.name);
       
       toast({
         title: "Login Successful!",

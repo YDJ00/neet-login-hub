@@ -1,12 +1,16 @@
-import { BookOpen, FileText, ClipboardCheck } from 'lucide-react';
+
+import { BookOpen, FileText, ClipboardCheck, BookText, BarChart2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import AccessButton from '@/components/AccessButton';
 import Footer from '@/components/Footer';
 import GoogleAd from '@/components/GoogleAd';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -50,16 +54,39 @@ const Index = () => {
           </div>
         </section>
         
-        <section className="bg-gray-100 py-12">
+        <section className="bg-gray-50 py-12 md:py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-              Ad Space
+              Additional Study Resources
             </h2>
-            <p className="text-gray-600 text-center">
-              This is an ad space. We can put some ads here.
-            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-100">
+                <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                  <BookText className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Important Formulas</h3>
+                <p className="text-gray-600 mb-4">Access all essential formulas for NEET Physics, Chemistry, and Biology in one place.</p>
+                <Button onClick={() => navigate('/formulas')} className="w-full bg-red-500 hover:bg-red-600">
+                  View Formulas
+                </Button>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-100">
+                <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                  <BarChart2 className="h-6 w-6 text-amber-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Chapter Weightage</h3>
+                <p className="text-gray-600 mb-4">Study chapter-wise weightage analysis for NEET based on previous years' papers.</p>
+                <Button onClick={() => navigate('/chapter-weightage')} className="w-full bg-amber-500 hover:bg-amber-600">
+                  View Weightage
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
+        
+        <GoogleAd className="py-6" />
         
         <section className="py-12 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">

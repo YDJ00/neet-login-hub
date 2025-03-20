@@ -3,18 +3,37 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isLoggedIn } from '@/utils/authUtils';
+import { useToast } from '@/hooks/use-toast';
 
 interface AccessButtonProps {
   text: string;
   className?: string;
+  destination?: string;
 }
 
-const AccessButton: React.FC<AccessButtonProps> = ({ text, className }) => {
+const AccessButton: React.FC<AccessButtonProps> = ({ text, className, destination = '/access-notes' }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleClick = async () => {
+    const loggedIn = await isLoggedIn();
+    
+    if (loggedIn) {
+      navigate(destination);
+    } else {
+      toast({
+        title: "Login Required",
+        description: "Please login to access this feature",
+        variant: "default",
+      });
+      navigate('/login');
+    }
+  };
 
   return (
     <Button 
-      onClick={() => navigate('/login')} 
+      onClick={handleClick} 
       className={`bg-neet-primary hover:bg-neet-dark text-white px-3 py-2 md:px-4 md:py-4 text-sm md:text-base inline-flex items-center justify-center w-auto max-w-full break-words ${className}`}
       size="lg"
     >
