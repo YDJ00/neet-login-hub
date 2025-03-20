@@ -1,70 +1,216 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
 import GoogleAd from '@/components/GoogleAd';
+import { redirectToLoginIfNeeded } from '@/utils/authUtils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 type Question = {
   id: number;
-  subject: 'Biology' | 'Physics' | 'Chemistry';
+  subject: 'Physics' | 'Chemistry' | 'Biology';
+  category?: string;
   text: string;
   options: string[];
   correctAnswer: number;
   explanation: string;
 };
 
-const mockQuestions: Question[] = [
+const physicsQuestions: Question[] = [
   {
     id: 1,
-    subject: 'Biology',
-    text: 'Which of the following organelles is known as the "powerhouse of the cell"?',
-    options: ['Nucleus', 'Mitochondria', 'Golgi apparatus', 'Endoplasmic reticulum'],
+    subject: 'Physics',
+    category: 'Mechanics',
+    text: 'A body is thrown vertically upwards with a speed of 20 m/s. What is its maximum height? (g = 10 m/s²)',
+    options: ['10 m', '20 m', '30 m', '40 m'],
     correctAnswer: 1,
-    explanation: 'Mitochondria are known as the "powerhouse of the cell" because they generate most of the cell\'s supply of adenosine triphosphate (ATP), used as a source of chemical energy.'
+    explanation: 'Using the equation v² = u² + 2as, where final velocity v = 0 at maximum height, initial velocity u = 20 m/s, and acceleration a = -g = -10 m/s². So, 0 = 20² + 2(-10)s, which gives s = 20 m.'
   },
   {
     id: 2,
-    subject: 'Chemistry',
-    text: 'Which of the following is NOT a state of matter?',
-    options: ['Solid', 'Liquid', 'Gas', 'Energy'],
-    correctAnswer: 3,
-    explanation: 'The states of matter are solid, liquid, gas, and plasma. Energy is a property that matter possesses and not a state of matter itself.'
+    subject: 'Physics',
+    category: 'Mechanics',
+    text: 'The distance covered by a body in 4 seconds under uniform acceleration is 40 m. Find its acceleration.',
+    options: ['2.5 m/s²', '5 m/s²', '10 m/s²', '20 m/s²'],
+    correctAnswer: 1,
+    explanation: 'Using the equation s = ut + (1/2)at², where s = 40 m, u = 0 (assuming initial velocity is zero), and t = 4 s. So, 40 = 0 + (1/2)a(16), which gives a = 5 m/s².'
   },
   {
     id: 3,
     subject: 'Physics',
-    text: 'What is the SI unit of force?',
-    options: ['Watt', 'Joule', 'Newton', 'Pascal'],
+    category: 'Mechanics',
+    text: 'A car moving with a speed of 30 m/s applies brakes and comes to rest in 10 seconds. What is the acceleration?',
+    options: ['-1 m/s²', '-2 m/s²', '-3 m/s²', '-4 m/s²'],
     correctAnswer: 2,
-    explanation: 'The newton (N) is the SI unit of force. It is named after Sir Isaac Newton and is defined as the force needed to accelerate 1 kilogram of mass at the rate of 1 meter per second squared.'
+    explanation: 'Using the equation a = (v - u)/t, where final velocity v = 0, initial velocity u = 30 m/s, and time t = 10 s. So, a = (0 - 30)/10 = -3 m/s².'
   },
   {
     id: 4,
-    subject: 'Biology',
-    text: 'DNA replication is:',
-    options: ['Conservative', 'Semi-conservative', 'Dispersive', 'Non-conservative'],
+    subject: 'Physics',
+    category: 'Mechanics',
+    text: 'A body of mass 5 kg is moving with a velocity of 10 m/s. What is its momentum?',
+    options: ['25 kg·m/s', '50 kg·m/s', '100 kg·m/s', '250 kg·m/s'],
     correctAnswer: 1,
-    explanation: 'DNA replication is semi-conservative, meaning that each strand of the original DNA molecule serves as a template for the production of a new strand, resulting in two DNA molecules, each containing one original and one new strand.'
+    explanation: 'Momentum = mass × velocity = 5 kg × 10 m/s = 50 kg·m/s.'
+  },
+  {
+    id: 5,
+    subject: 'Physics',
+    category: 'Thermodynamics',
+    text: 'A gas expands from a volume of 2 m³ to 4 m³. The pressure is constant at 10 Pa. What is the work done?',
+    options: ['10 J', '20 J', '30 J', '40 J'],
+    correctAnswer: 1,
+    explanation: 'Work done = pressure × change in volume = 10 Pa × (4 - 2) m³ = 20 J.'
+  }
+];
+
+const chemistryQuestions: Question[] = [
+  {
+    id: 1,
+    subject: 'Chemistry',
+    category: 'Organic Chemistry',
+    text: 'What is the IUPAC name of CH₃-CH₂-CHO?',
+    options: ['Methanol', 'Ethanal', 'Propanal', 'Butanal'],
+    correctAnswer: 2,
+    explanation: 'The IUPAC name of CH₃-CH₂-CHO is propanal, as it contains a three-carbon chain with an aldehyde group at the end.'
+  },
+  {
+    id: 2,
+    subject: 'Chemistry',
+    category: 'Organic Chemistry',
+    text: 'Which of the following is a characteristic property of alkanes?',
+    options: ['They are highly reactive', 'They are polar and soluble in water', 'They are non-polar and insoluble in water', 'They readily undergo addition reactions'],
+    correctAnswer: 2,
+    explanation: 'Alkanes are non-polar hydrocarbons with single bonds, making them insoluble in water and relatively unreactive compared to other organic compounds.'
+  },
+  {
+    id: 3,
+    subject: 'Chemistry',
+    category: 'Inorganic Chemistry',
+    text: 'The oxidation state of chlorine in NaClO₃ is:',
+    options: ['+1', '+3', '+5', '+7'],
+    correctAnswer: 2,
+    explanation: 'In NaClO₃, Na has oxidation state +1, O has -2 (three oxygen atoms total -6), and since the compound is neutral, chlorine must have an oxidation state of +5.'
+  },
+  {
+    id: 4,
+    subject: 'Chemistry',
+    category: 'Physical Chemistry',
+    text: 'What is the molarity of a solution prepared by dissolving 10 g of NaCl (Molar mass = 58.5 g/mol) in 500 mL of solution?',
+    options: ['0.17 M', '0.34 M', '0.51 M', '0.68 M'],
+    correctAnswer: 1,
+    explanation: 'Molarity = moles/volume in liters. Moles of NaCl = 10/58.5 = 0.171 mol. Volume = 500 mL = 0.5 L. Molarity = 0.171/0.5 = 0.34 M.'
   },
   {
     id: 5,
     subject: 'Chemistry',
-    text: 'Which of the following elements has the highest electronegativity?',
-    options: ['Oxygen', 'Nitrogen', 'Fluorine', 'Chlorine'],
+    category: 'Physical Chemistry',
+    text: 'What is the pH of a neutral solution at 25°C?',
+    options: ['0', '4', '7', '14'],
     correctAnswer: 2,
-    explanation: 'Fluorine has the highest electronegativity value (3.98 on the Pauling scale) among all elements in the periodic table.'
+    explanation: 'At 25°C, a neutral solution has a pH of 7, which means the concentration of hydrogen ions [H⁺] equals the concentration of hydroxide ions [OH⁻].'
   }
 ];
+
+const biologyQuestions: Question[] = [
+  {
+    id: 1,
+    subject: 'Biology',
+    category: 'Cell Biology',
+    text: 'The cell organelle responsible for protein synthesis is:',
+    options: ['Mitochondria', 'Ribosome', 'Golgi apparatus', 'Lysosome'],
+    correctAnswer: 1,
+    explanation: 'Ribosomes are the cellular organelles responsible for protein synthesis. They read the messenger RNA (mRNA) and translate the genetic code to produce proteins.'
+  },
+  {
+    id: 2,
+    subject: 'Biology',
+    category: 'Cell Biology',
+    text: 'The mitochondrion is known as the:',
+    options: ['Brain of the cell', 'Powerhouse of the cell', 'Kitchen of the cell', 'Storehouse of the cell'],
+    correctAnswer: 1,
+    explanation: 'Mitochondria are known as the powerhouse of the cell because they generate most of the cell\'s supply of adenosine triphosphate (ATP), which is used as energy.'
+  },
+  {
+    id: 3,
+    subject: 'Biology',
+    category: 'Genetics',
+    text: 'The process by which genetic material is passed from parent to offspring is called:',
+    options: ['Mutation', 'Evolution', 'Heredity', 'Variation'],
+    correctAnswer: 2,
+    explanation: 'Heredity is the process by which genetic information is passed from parent to offspring, resulting in the inheritance of traits.'
+  },
+  {
+    id: 4,
+    subject: 'Biology',
+    category: 'Human Physiology',
+    text: 'The hormone responsible for regulating blood sugar levels is:',
+    options: ['Thyroxine', 'Insulin', 'Estrogen', 'Testosterone'],
+    correctAnswer: 1,
+    explanation: 'Insulin is the hormone produced by the beta cells of the pancreas that regulates blood glucose levels by allowing cells to take up glucose from the bloodstream.'
+  },
+  {
+    id: 5,
+    subject: 'Biology',
+    category: 'Human Physiology',
+    text: 'Which organ produces bile in the human body?',
+    options: ['Pancreas', 'Liver', 'Kidney', 'Spleen'],
+    correctAnswer: 1,
+    explanation: 'The liver produces bile, which is stored in the gallbladder and released into the small intestine to aid in the digestion and absorption of fats.'
+  }
+];
+
+// Combine all questions
+const allQuestions: Question[] = [...physicsQuestions, ...chemistryQuestions, ...biologyQuestions];
 
 const MockTest = () => {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<number[]>(Array(mockQuestions.length).fill(-1));
+  const [selectedAnswers, setSelectedAnswers] = useState<number[]>(Array(allQuestions.length).fill(-1));
   const [showResults, setShowResults] = useState(false);
-  const [timer, setTimer] = useState(300); // 5 minutes in seconds
+  const [timer, setTimer] = useState(900); // 15 minutes in seconds
+  const [activeSubject, setActiveSubject] = useState<'all' | 'Physics' | 'Chemistry' | 'Biology'>('all');
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  
+  useEffect(() => {
+    const checkLogin = async () => {
+      const loggedIn = await redirectToLoginIfNeeded(navigate);
+      setIsLoggedIn(loggedIn);
+    };
+    
+    checkLogin();
+  }, [navigate]);
+  
+  useEffect(() => {
+    let interval: number | undefined;
+    
+    if (timer > 0 && !showResults && isLoggedIn) {
+      interval = window.setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            setShowResults(true);
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer, showResults, isLoggedIn]);
+  
+  // Get questions based on selected subject
+  const filteredQuestions = activeSubject === 'all' 
+    ? allQuestions 
+    : allQuestions.filter(q => q.subject === activeSubject);
   
   const handleOptionSelect = (optionIndex: number) => {
     const newSelectedAnswers = [...selectedAnswers];
@@ -73,7 +219,7 @@ const MockTest = () => {
   };
   
   const handleNext = () => {
-    if (currentQuestion < mockQuestions.length - 1) {
+    if (currentQuestion < filteredQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       setShowResults(true);
@@ -88,8 +234,8 @@ const MockTest = () => {
   
   const calculateScore = () => {
     let score = 0;
-    selectedAnswers.forEach((answer, index) => {
-      if (answer === mockQuestions[index].correctAnswer) {
+    filteredQuestions.forEach((question, index) => {
+      if (selectedAnswers[index] === question.correctAnswer) {
         score++;
       }
     });
@@ -102,6 +248,10 @@ const MockTest = () => {
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  if (!isLoggedIn) {
+    return null; // Empty rendering while redirecting to login
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,15 +269,16 @@ const MockTest = () => {
       
       <main className="container mx-auto px-4 py-8">
         {!showResults ? (
-          <Card className="w-full max-w-3xl mx-auto">
+          <Card className="w-full max-w-4xl mx-auto">
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <CardTitle className="text-lg">
-                    Question {currentQuestion + 1} of {mockQuestions.length}
+                    Question {currentQuestion + 1} of {filteredQuestions.length}
                   </CardTitle>
                   <CardDescription>
-                    Subject: {mockQuestions[currentQuestion].subject}
+                    Subject: {filteredQuestions[currentQuestion].subject} 
+                    {filteredQuestions[currentQuestion].category && ` | Category: ${filteredQuestions[currentQuestion].category}`}
                   </CardDescription>
                 </div>
                 <div className="flex items-center bg-neet-light px-3 py-1 rounded-full">
@@ -136,28 +287,50 @@ const MockTest = () => {
                 </div>
               </div>
             </CardHeader>
+            
             <CardContent>
+              <Tabs
+                defaultValue="all"
+                value={activeSubject}
+                onValueChange={(value) => {
+                  setActiveSubject(value as 'all' | 'Physics' | 'Chemistry' | 'Biology');
+                  setCurrentQuestion(0);
+                  setSelectedAnswers(Array(filteredQuestions.length).fill(-1));
+                }}
+                className="mb-6"
+              >
+                <TabsList className="grid grid-cols-4 mb-6">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="Physics">Physics</TabsTrigger>
+                  <TabsTrigger value="Chemistry">Chemistry</TabsTrigger>
+                  <TabsTrigger value="Biology">Biology</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
               <div className="mb-6">
-                <p className="text-lg font-medium">{mockQuestions[currentQuestion].text}</p>
+                <p className="text-lg font-medium">{filteredQuestions[currentQuestion].text}</p>
               </div>
+              
               <div className="space-y-3">
-                {mockQuestions[currentQuestion].options.map((option, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Checkbox 
-                      id={`option-${index}`} 
-                      checked={selectedAnswers[currentQuestion] === index}
-                      onCheckedChange={() => handleOptionSelect(index)}
-                    />
-                    <label 
-                      htmlFor={`option-${index}`}
-                      className={`text-base cursor-pointer ${selectedAnswers[currentQuestion] === index ? 'font-medium' : ''}`}
-                    >
-                      {option}
-                    </label>
-                  </div>
-                ))}
+                <RadioGroup 
+                  value={selectedAnswers[currentQuestion] !== -1 ? selectedAnswers[currentQuestion].toString() : undefined}
+                  onValueChange={(value) => handleOptionSelect(parseInt(value))}
+                >
+                  {filteredQuestions[currentQuestion].options.map((option, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-50">
+                      <RadioGroupItem id={`option-${index}`} value={index.toString()} />
+                      <Label 
+                        htmlFor={`option-${index}`}
+                        className="text-base cursor-pointer"
+                      >
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
             </CardContent>
+            
             <CardFooter className="flex justify-between">
               <Button 
                 variant="outline" 
@@ -170,22 +343,22 @@ const MockTest = () => {
               <Button 
                 onClick={handleNext}
               >
-                {currentQuestion === mockQuestions.length - 1 ? 'Finish' : 'Next'}
-                {currentQuestion !== mockQuestions.length - 1 && <ArrowRight className="h-4 w-4 ml-2" />}
+                {currentQuestion === filteredQuestions.length - 1 ? 'Finish' : 'Next'}
+                {currentQuestion !== filteredQuestions.length - 1 && <ArrowRight className="h-4 w-4 ml-2" />}
               </Button>
             </CardFooter>
           </Card>
         ) : (
-          <Card className="w-full max-w-3xl mx-auto">
+          <Card className="w-full max-w-4xl mx-auto">
             <CardHeader>
               <CardTitle>Test Results</CardTitle>
               <CardDescription>
-                You scored {calculateScore()} out of {mockQuestions.length}
+                You scored {calculateScore()} out of {filteredQuestions.length}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {mockQuestions.map((question, qIndex) => (
+                {filteredQuestions.map((question, qIndex) => (
                   <div key={qIndex} className="border rounded-md p-4">
                     <p className="font-medium mb-2">{qIndex + 1}. {question.text}</p>
                     <div className="space-y-2 mb-4">
@@ -222,8 +395,9 @@ const MockTest = () => {
               <Button 
                 onClick={() => {
                   setCurrentQuestion(0);
-                  setSelectedAnswers(Array(mockQuestions.length).fill(-1));
+                  setSelectedAnswers(Array(filteredQuestions.length).fill(-1));
                   setShowResults(false);
+                  setTimer(900); // Reset timer to 15 minutes
                 }}
                 className="mr-2"
               >

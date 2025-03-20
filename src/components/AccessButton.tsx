@@ -16,7 +16,9 @@ const AccessButton: React.FC<AccessButtonProps> = ({ text, className, destinatio
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default to avoid refresh issues
+    
     const loggedIn = await isLoggedIn();
     
     if (loggedIn) {
