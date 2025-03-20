@@ -24,8 +24,7 @@ const AccessButton: React.FC<AccessButtonProps> = ({ text, className, destinatio
     if (isAuthenticated) {
       navigate(destination);
     } else {
-      const loggedIn = await redirectToLoginIfNeeded(navigate);
-      // This is now handled in redirectToLoginIfNeeded
+      await redirectToLoginIfNeeded(navigate);
     }
   };
 

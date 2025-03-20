@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
 import GoogleAd from '@/components/GoogleAd';
-import { redirectToLoginIfNeeded } from '@/utils/authUtils';
+import { redirectToLoginIfNeeded, getAuthState } from '@/utils/authUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -165,7 +163,6 @@ const biologyQuestions: Question[] = [
   }
 ];
 
-// Combine all questions
 const allQuestions: Question[] = [...physicsQuestions, ...chemistryQuestions, ...biologyQuestions];
 
 const MockTest = () => {
@@ -179,8 +176,12 @@ const MockTest = () => {
   
   useEffect(() => {
     const checkLogin = async () => {
-      const loggedIn = await redirectToLoginIfNeeded(navigate);
-      setIsLoggedIn(loggedIn);
+      const authState = getAuthState();
+      setIsLoggedIn(authState);
+      
+      if (!authState) {
+        await redirectToLoginIfNeeded(navigate);
+      }
     };
     
     checkLogin();
@@ -207,7 +208,6 @@ const MockTest = () => {
     };
   }, [timer, showResults, isLoggedIn]);
   
-  // Get questions based on selected subject
   const filteredQuestions = activeSubject === 'all' 
     ? allQuestions 
     : allQuestions.filter(q => q.subject === activeSubject);
@@ -242,7 +242,6 @@ const MockTest = () => {
     return score;
   };
   
-  // Format time as mm:ss
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -250,7 +249,28 @@ const MockTest = () => {
   };
 
   if (!isLoggedIn) {
-    return null; // Empty rendering while redirecting to login
+    return null;
+  }
+
+  if (filteredQuestions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-lg mx-auto">
+          <CardHeader>
+            <CardTitle>No Questions Available</CardTitle>
+            <CardDescription>
+              There are no questions available for this subject at the moment.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button variant="outline" onClick={() => navigate('/')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -397,7 +417,7 @@ const MockTest = () => {
                   setCurrentQuestion(0);
                   setSelectedAnswers(Array(filteredQuestions.length).fill(-1));
                   setShowResults(false);
-                  setTimer(900); // Reset timer to 15 minutes
+                  setTimer(900);
                 }}
                 className="mr-2"
               >
