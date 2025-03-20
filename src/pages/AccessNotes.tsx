@@ -7,7 +7,7 @@ import GoogleAd from '@/components/GoogleAd';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { redirectToLoginIfNeeded } from '@/utils/authUtils';
+import { getAuthState, redirectToLoginIfNeeded } from '@/utils/authUtils';
 import { useToast } from '@/hooks/use-toast';
 
 const AccessNotes = () => {
@@ -18,11 +18,15 @@ const AccessNotes = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const loggedIn = await redirectToLoginIfNeeded(navigate);
-      if (loggedIn) {
+      const isAuthenticated = getAuthState();
+      
+      if (!isAuthenticated) {
+        await redirectToLoginIfNeeded(navigate);
+      } else {
         const name = localStorage.getItem('neet_user_name') || '';
         setUserName(name);
       }
+      
       setIsLoading(false);
     };
     

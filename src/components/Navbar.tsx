@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { LogIn, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { isLoggedIn } from '@/utils/authUtils';
+import { isLoggedIn, setAuthState } from '@/utils/authUtils';
 import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
@@ -15,9 +15,9 @@ const Navbar = () => {
   
   useEffect(() => {
     const checkAuth = async () => {
-      // Use the simple localStorage approach for now
-      const mobile = localStorage.getItem('neet_user_mobile');
-      setAuthenticated(!!mobile);
+      const loggedIn = await isLoggedIn();
+      setAuthenticated(loggedIn);
+      setAuthState(loggedIn);
     };
     
     checkAuth();
@@ -32,13 +32,16 @@ const Navbar = () => {
     localStorage.removeItem('neet_user_mobile');
     localStorage.removeItem('neet_user_name');
     
+    // Update auth states
+    setAuthenticated(false);
+    setAuthState(false);
+    
     // Show toast notification
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
     });
     
-    setAuthenticated(false);
     navigate('/');
   };
 

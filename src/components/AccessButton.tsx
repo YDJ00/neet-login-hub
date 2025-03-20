@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { isLoggedIn } from '@/utils/authUtils';
+import { getAuthState, redirectToLoginIfNeeded } from '@/utils/authUtils';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccessButtonProps {
@@ -19,17 +19,13 @@ const AccessButton: React.FC<AccessButtonProps> = ({ text, className, destinatio
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent default to avoid refresh issues
     
-    const loggedIn = await isLoggedIn();
+    const isAuthenticated = getAuthState();
     
-    if (loggedIn) {
+    if (isAuthenticated) {
       navigate(destination);
     } else {
-      toast({
-        title: "Login Required",
-        description: "Please login to access this feature",
-        variant: "default",
-      });
-      navigate('/login');
+      const loggedIn = await redirectToLoginIfNeeded(navigate);
+      // This is now handled in redirectToLoginIfNeeded
     }
   };
 

@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateLoginForm, FormErrors } from '@/utils/formValidation';
 import { useNavigate } from 'react-router-dom';
+import { setAuthState } from '@/utils/authUtils';
 
 export type LoginFormData = {
   name: string;
@@ -85,6 +86,9 @@ export const useLoginForm = () => {
         localStorage.setItem('neet_user_mobile', formData.mobile);
         localStorage.setItem('neet_user_name', existingUsers[0].name);
         
+        // Set global auth state
+        setAuthState(true);
+        
         toast({
           title: "Login Successful!",
           description: "Welcome back!",
@@ -118,6 +122,9 @@ export const useLoginForm = () => {
       // Create a session for the new user
       localStorage.setItem('neet_user_mobile', formData.mobile);
       localStorage.setItem('neet_user_name', formData.name);
+      
+      // Set global auth state
+      setAuthState(true);
       
       toast({
         title: "Login Successful!",
